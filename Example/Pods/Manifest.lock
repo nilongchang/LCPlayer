@@ -1,0 +1,16 @@
+PODS:
+  - LCPlayer (0.1.0)
+
+DEPENDENCIES:
+  - LCPlayer (from `../`)
+
+EXTERNAL SOURCES:
+  LCPlayer:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  LCPlayer: 6504b39b4c49188439699cf0bdb934374f9f444b
+
+PODFILE CHECKSUM: 70bc217d269e51ab80908d08cfd8870498c9a1cc
+
+COCOAPODS: 1.12.1

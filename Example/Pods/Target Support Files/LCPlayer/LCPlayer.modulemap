@@ -1,0 +1,6 @@
+framework module LCPlayer {
+  umbrella header "LCPlayer-umbrella.h"
+
+  export *
+  module * { export * }
+}
