@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="vXZ-lx-hvc">
-    <device id="retina4_7" orientation="portrait">
-        <adaptation id="fullscreen"/>
-    </device>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="vXZ-lx-hvc">
+    <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -20,11 +19,54 @@
                     <view key="view" contentMode="scaleToFill" id="kh9-bI-dsS">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="mMY-GT-gxm">
+                                <rect key="frame" x="0.0" y="228" width="375" height="211"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="V34-st-ueh">
+                                        <rect key="frame" x="293" y="157" width="59" height="35"/>
+                                        <state key="normal" title="Button"/>
+                                        <buttonConfiguration key="configuration" style="plain" title="全屏"/>
+                                        <connections>
+                                            <action selector="fullAction:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="3h7-nh-MaC"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <color key="backgroundColor" systemColor="separatorColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="mMY-GT-gxm" secondAttribute="height" multiplier="16:9" id="fiy-GP-t5l"/>
+                                    <constraint firstAttribute="trailing" secondItem="V34-st-ueh" secondAttribute="trailing" constant="23" id="oFS-MI-7m3"/>
+                                    <constraint firstAttribute="bottom" secondItem="V34-st-ueh" secondAttribute="bottom" constant="19" id="snc-f4-DvX"/>
+                                </constraints>
+                            </view>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="16V-5T-UVe">
+                                <rect key="frame" x="67" y="59" width="240" height="128"/>
+                            </imageView>
+                        </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="mMY-GT-gxm" firstAttribute="top" secondItem="16V-5T-UVe" secondAttribute="bottom" constant="41" id="EFw-MT-n3t"/>
+                            <constraint firstItem="16V-5T-UVe" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" constant="67" id="Evz-NV-fRm"/>
+                            <constraint firstAttribute="trailing" secondItem="mMY-GT-gxm" secondAttribute="trailing" id="QXw-eU-PkV"/>
+                            <constraint firstItem="16V-5T-UVe" firstAttribute="top" secondItem="jyV-Pf-zRb" secondAttribute="bottom" constant="59" id="XSa-ga-fSJ"/>
+                            <constraint firstItem="mMY-GT-gxm" firstAttribute="centerY" secondItem="kh9-bI-dsS" secondAttribute="centerY" id="cK0-YY-WGm"/>
+                            <constraint firstAttribute="trailing" secondItem="16V-5T-UVe" secondAttribute="trailing" constant="68" id="d4d-td-bK9"/>
+                            <constraint firstItem="mMY-GT-gxm" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" id="eld-Ww-0aA"/>
+                        </constraints>
                     </view>
+                    <connections>
+                        <outlet property="containerView" destination="mMY-GT-gxm" id="DPu-tA-79V"/>
+                        <outlet property="coverImageView" destination="16V-5T-UVe" id="PJZ-bS-ge7"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>
             </objects>
+            <point key="canvasLocation" x="22" y="1"/>
         </scene>
     </scenes>
+    <resources>
+        <systemColor name="separatorColor">
+            <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.28999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+    </resources>
 </document>

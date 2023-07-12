@@ -1,8 +1,16 @@
 PODS:
   - LCPlayer (0.1.0)
+  - SDWebImage (5.16.0):
+    - SDWebImage/Core (= 5.16.0)
+  - SDWebImage/Core (5.16.0)
 
 DEPENDENCIES:
   - LCPlayer (from `../`)
+  - SDWebImage (= 5.16.0)
+
+SPEC REPOS:
+  trunk:
+    - SDWebImage
 
 EXTERNAL SOURCES:
   LCPlayer:
@@ -10,7 +18,8 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   LCPlayer: 6504b39b4c49188439699cf0bdb934374f9f444b
+  SDWebImage: 2aea163b50bfcb569a2726b6a754c54a4506fcf6
 
-PODFILE CHECKSUM: 70bc217d269e51ab80908d08cfd8870498c9a1cc
+PODFILE CHECKSUM: 68dc46c2a6a759b94050272c8e370690a567b804
 
 COCOAPODS: 1.12.1

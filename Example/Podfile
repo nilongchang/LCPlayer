@@ -4,7 +4,7 @@ platform :ios, '11.0'
 
 target 'LCPlayer_Example' do
   pod 'LCPlayer', :path => '../'
-
+  pod 'SDWebImage', '5.16.0'
   target 'LCPlayer_Tests' do
     inherit! :search_paths
 
