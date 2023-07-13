@@ -18,10 +18,7 @@ public class LCPlayerRenderingView: UIView {
         return layer as! AVPlayerLayer
     }()
     
-//    weak var player: AVPlayer!
-    
     required init(with player: AVPlayer) {
-//        self.player = player
         super.init(frame: .zero)
         self.playerLayer.player = player
     }

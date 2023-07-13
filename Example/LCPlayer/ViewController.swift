@@ -16,25 +16,22 @@ class ViewController: UIViewController {
     @IBOutlet weak var containerView: UIView!
     
     @IBOutlet weak var coverImageView: UIImageView!
-    lazy var playerController: LCPlayerController = {
-        let player = LCPlayerController(containerView: containerView)
-        player.player.playbackDelegate = self
-        return player
-    }()
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        let assetURLs = ["https://ct-vd1.jianzhishuyuan.net//dsh/front/20230711/0063575f1e1b25007806690b46776d63.mp4",
-                         "https://ct-vd1.jianzhishuyuan.net//dsh/front/20230711/a71534a9e0e8a7cda36bb246299a00fb.mp4"].map {
-            return URL(string: $0)
-        }
-        
-        self.playerController.assetURLs = assetURLs
-        self.playerController.play()
-        coverImageView.sd_setImage(with: URL(string: "https://ct2.jianzhiweike.com.cn/dsh/20230711/e4ac47ef4751ead227a79114e9da7bf6.jpg"))
+//        let assetURLs = ["https://ct-vd1.jianzhishuyuan.net//dsh/front/20230711/0063575f1e1b25007806690b46776d63.mp4",
+//                         "https://ct-vd1.jianzhishuyuan.net//dsh/front/20230711/a71534a9e0e8a7cda36bb246299a00fb.mp4"].map {
+//            return URL(string: $0)
+//        }
+//
+//        self.playerController.assetURLs = assetURLs
+//        self.playerController.play()
+//        coverImageView.sd_setImage(with: URL(string: "https://ct2.jianzhiweike.com.cn/dsh/20230711/e4ac47ef4751ead227a79114e9da7bf6.jpg"))
     }
 
     @IBAction func fullAction(_ sender: UIButton) {
-        
+        let playerVC = LCPlayerViewController(url: "https://ct-vd1.jianzhishuyuan.net//dsh/front/20230711/0063575f1e1b25007806690b46776d63.mp4", title: nil, supportedOrientations: nil, presentationOrientation: nil)
+        present(playerVC, animated: true)
     }
     
 
