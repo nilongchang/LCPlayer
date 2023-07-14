@@ -80,6 +80,16 @@ public class LCPlayer: AVPlayer {
     }
     
     // MARK: - Override ----------------------------
+    public override func play() {
+        super.play()
+        playbackDelegate?.playbackDidBegin(player: self)
+    }
+    
+    public override func pause() {
+        super.pause()
+        playbackDelegate?.playbackDidPause(player: self)
+    }
+    
     public override func replaceCurrentItem(with item: AVPlayerItem?) {
         if let item = currentItem {
             LCPlayerObserverKey.allCases.forEach { key in
@@ -176,8 +186,9 @@ extension LCPlayer {
             return 0.0
         }
         let value = item.currentTime()
-        if !value.seconds.isNaN {
-            return value.seconds
+        let seconds = value.seconds
+        if !seconds.isNaN, seconds > 0 {
+            return seconds
         }else {
             return 0.0
         }
@@ -190,9 +201,10 @@ extension LCPlayer {
         guard let item = currentItem else {
             return 0.0
         }
-        let value = item.duration
-        if !value.seconds.isNaN {
-            return value.seconds
+        let value = item.duration        
+        let seconds = value.seconds
+        if !seconds.isNaN, seconds > 0 {
+            return seconds
         }else {
             return 0.0
         }

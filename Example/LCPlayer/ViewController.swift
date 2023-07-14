@@ -31,6 +31,7 @@ class ViewController: UIViewController {
 
     @IBAction func fullAction(_ sender: UIButton) {
         let playerVC = LCPlayerViewController(url: "https://ct-vd1.jianzhishuyuan.net//dsh/front/20230711/0063575f1e1b25007806690b46776d63.mp4", title: nil, supportedOrientations: nil, presentationOrientation: nil)
+        playerVC.modalPresentationStyle = .fullScreen
         present(playerVC, animated: true)
     }
     
@@ -39,6 +40,8 @@ class ViewController: UIViewController {
 
 // MARK: - LCPlayerPlaybackDelegate ----------------------------
 extension ViewController: LCPlayerPlaybackDelegate {
+    
+    
     func playbackAssetLoaded(player: LCPlayer) {
         print("playbackAssetLoaded")
     }
@@ -55,6 +58,13 @@ extension ViewController: LCPlayerPlaybackDelegate {
         print("playbackTimeDidChange: \(time)")
     }
     
+    func playbackDidBegin(player: LCPlayer) {
+        print("playbackDidBegin")
+    }
+    
+    func playbackDidPause(player: LCPlayer) {
+        print("playbackDidPause")
+    }
     func playbackDidEnd(player: LCPlayer) {
         print("playbackDidEnd")
     }

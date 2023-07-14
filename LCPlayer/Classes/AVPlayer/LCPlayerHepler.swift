@@ -22,11 +22,11 @@ public protocol LCPlayerPlaybackDelegate: AnyObject {
     /// 时间改变
     func playbackTimeDidChange(player: LCPlayer, to time: CMTime)
     
-//    /// 开始播放（点击 play
-//    func playbackDidBegin(player: LCPlayer)
+    /// 开始播放（点击 play
+    func playbackDidBegin(player: LCPlayer)
     
-//    /// 暂停播放 （点击 pause
-//    func playbackDidPause(player: LCPlayer)
+    /// 暂停播放 （点击 pause
+    func playbackDidPause(player: LCPlayer)
     
     /// 播放到结束
     func playbackDidEnd(player: LCPlayer)
@@ -57,11 +57,11 @@ extension LCPlayerPlaybackDelegate {
     /// 时间改变
     func playbackTimeDidChange(player: LCPlayer, to time: CMTime) {}
     
-//    /// 开始播放（点击 play
-//    func playbackDidBegin(player: LCPlayer) {}
+    /// 开始播放（点击 play
+    func playbackDidBegin(player: LCPlayer) {}
     
-//    /// 暂停播放 （点击 pause
-//    func playbackDidPause(player: LCPlayer) {}
+    /// 暂停播放 （点击 pause
+    func playbackDidPause(player: LCPlayer) {}
     
     /// 播放到结束
     func playbackDidEnd(player: LCPlayer) {}

@@ -10,52 +10,62 @@ import AVFoundation
 
 public class LCVideoPlayerView: LCBasePlayerView {
     // MARK: - UI ----------------------------
-    /// 关闭
-    private lazy var closeButton: UIButton = {
-        let button = UIButton()
-        button.setBackgroundImage(UIImage(named: "icon_close"), for: .normal)
-        button.addTarget(self, action: #selector(closeAction(_ :)), for: .touchUpInside)
-        return button
-    }()
+    /// 控制uiview
+    public lazy var playerControls: LCVideoPlayerControls = {
+        let view = LCVideoPlayerControls()
+        // 关闭
+        view.closeHander = {
 
-    /// 旋转
-    private lazy var rotateButton: UIButton = {
-        let button = UIButton()
-        button.setBackgroundImage(UIImage(named: "icon_rotate"), for: .normal)
-        button.addTarget(self, action: #selector(closeAction(_ :)), for: .touchUpInside)
-        return button
-    }()
-    
-    /// 开始时间
-    private lazy var startTimeLabel: UILabel = {
-        let label = UILabel()
-        label.textColor = UIColor.white
-        label.font = UIFont.systemFont(ofSize: 12)
-        return label
-    }()
-    
-    /// 结束时间
-    private lazy var endTimeLabel: UILabel = {
-        let label = UILabel()
-        label.textColor = UIColor.white
-        label.font = UIFont.systemFont(ofSize: 12)
-        return label
-    }()
-    
-    /// 进度
-    private lazy var progressView: LCVideoPlayerSlider = {
-        let view = LCVideoPlayerSlider()
-        view.trackTintColor = UIColor.white.withAlphaComponent(0.5)
-        view.bufferTintColor = UIColor.black.withAlphaComponent(0.5)
-        view.progressTintColor = UIColor(red: 0, green: 205, blue: 220, alpha: 1)
-        view.handlerBlock = { state in
-            
+        }
+        // 播放/暂停
+        view.playOrPauseHander = {[weak self] isPlay in
+            if isPlay {
+                self?.play()
+            }else {
+                self?.pause()
+            }
+        }
+        // 旋转
+        view.rotateHander = {
+
+        }
+        
+        view.bottomBar.progressView.handlerBlock = { [weak self] state in
+            guard let self = self else { return }
+            switch state {
+            case .changed(progress: let progress):
+                let time = self.player.endTime() * progress
+                let text = self.textWithTime(time: time)
+                debugPrint("changed(progress: \(progress) \(time) \(text)")
+                self.playerControls.bottomBar.startTimeLabel.text = text
+                break
+            case .onTap(progress: let progress):
+                self.isBeginDrag = true
+                self.seekToProgress(progress, completionHandler: { isFinish in
+                    self.isBeginDrag = false
+                })
+                break
+           
+            case .began(progress: let progress):
+                self.isBeginDrag = true
+                break
+            case .ended(progress: let progress):
+                
+                self.seekToProgress(progress, completionHandler: { isFinish in
+                    self.isBeginDrag = false
+                })
+                break
+            case .cancel:
+                self.isBeginDrag = false
+                break
+            }
         }
         return view
     }()
-    
-    var closeHander: (() -> Void)?
-    var rotateHander: (() -> Void)?
+    /// 时间formatter
+    private let formatter = DateFormatter()
+    /// 是否开始拖拽
+    var isBeginDrag = false
     
     // MARK: - Life Cycle ----------------------------
     override init(frame: CGRect) {
@@ -70,38 +80,31 @@ public class LCVideoPlayerView: LCBasePlayerView {
     
     public override func layoutSubviews() {
         super.layoutSubviews()
-        updateLayout()
+        playerControls.frame = bounds
     }
     
     private func setupUI() {
-        addSubview(closeButton)
-        addSubview(rotateButton)
-        addSubview(startTimeLabel)
-        addSubview(endTimeLabel)
-        addSubview(progressView)
+        addSubview(playerControls)
     }
+    // MARK: - Private Method ----------------------------
     
-    private func updateLayout() {
-        let width = bounds.width
-        let height = bounds.height
-        let timeSize = CGSize(width: 57, height: 13)
-        
-        
-        closeButton.frame = CGRect(x: 15, y: 63, width: 32, height: 32)
-        rotateButton.frame = CGRect(x: width - 24 - 17, y: height - 24 - 82, width: 24, height: 24)
-        startTimeLabel.frame = CGRect(x: 0, y: height - 34, width: timeSize.width, height: timeSize.height)
-        endTimeLabel.frame = CGRect(x: width - timeSize.width, y: startTimeLabel.bounds.minY, width: timeSize.width, height: timeSize.height)
-        progressView.frame = CGRect(x: startTimeLabel.bounds.width, y: startTimeLabel.bounds.minY, width: width - timeSize.width * 2, height: timeSize.height)
-        
+    /// 播放progress
+    /// - Parameter progress: 进度
+    private func seekToProgress(_ progress: CGFloat, completionHandler: @escaping (Bool) -> Void) {
+        let time = player.endTime() * progress
+        playerControls.bottomBar.startTimeLabel.text = textWithTime(time: time)
+        seek(to: time, completionHandler: completionHandler)
     }
-    
-    // MARK: - Touch Event ----------------------------
-    @objc private func closeAction(_ button: UIButton) {
-        closeHander?()
-    }
-    
-    @objc private func rotateAction(_ button: UIButton) {
-        rotateHander?()
+    // 时间
+    private func textWithTime(time: TimeInterval) -> String {
+        var timeFormat: String = "HH:mm:ss"
+        if time <= 3599 {
+            timeFormat = "mm:ss"
+        }
+        let date = Date(timeIntervalSince1970: time)
+        formatter.timeZone = TimeZone.init(secondsFromGMT: 0)
+        formatter.dateFormat = timeFormat
+        return formatter.string(from: date)
     }
     
     // MARK: - LCPlayerPlaybackDelegate ----------------------------
@@ -118,16 +121,34 @@ public class LCVideoPlayerView: LCBasePlayerView {
     /// 当前item准备播放（可播放
     public override func playbackItemReadyToPlay(player: LCPlayer, item: LCPlayerItem) {
         super.playbackItemReadyToPlay(player: player, item: item)
+        playerControls.bottomBar.startTimeLabel.text = textWithTime(time: player.startTime())
+        playerControls.bottomBar.endTimeLabel.text = textWithTime(time: player.endTime())
     }
     
     /// 时间改变
     public override func playbackTimeDidChange(player: LCPlayer, to time: CMTime) {
         super.playbackTimeDidChange(player: player, to: time)
+        if !isBeginDrag {
+            playerControls.bottomBar.startTimeLabel.text = textWithTime(time: player.startTime())
+            playerControls.bottomBar.progressView.progress = time.seconds / player.endTime()
+        }
     }
-
+    
+    /// 开始播放（点击 play
+    public override func playbackDidBegin(player: LCPlayer) {
+        super.playbackDidBegin(player: player)
+        playerControls.playOrPauseButton.isSelected = true
+    }
+    
+    /// 暂停播放 （点击 pause
+    public override func playbackDidPause(player: LCPlayer) {
+        super.playbackDidPause(player: player)
+        playerControls.playOrPauseButton.isSelected = false
+    }
     /// 播放到结束
     public override func playbackDidEnd(player: LCPlayer) {
         super.playbackDidEnd(player: player)
+        playerControls.playOrPauseButton.isSelected = false
     }
     
     /// 开始缓冲
@@ -138,6 +159,7 @@ public class LCVideoPlayerView: LCBasePlayerView {
     /// 缓冲的进度
     public override func playbackLoadedTimeRanges(player: LCPlayer, progress: CGFloat) {
         super.playbackLoadedTimeRanges(player: player, progress: progress)
+        playerControls.bottomBar.progressView.bufferProgress = progress
     }
     
     /// 缓存完毕
@@ -148,6 +170,7 @@ public class LCVideoPlayerView: LCBasePlayerView {
     /// 播放错误
     public override func playbackDidFailed(player: LCPlayer, error: Error) {
         super.playbackDidFailed(player: player, error: error)
+        playerControls.playOrPauseButton.isSelected = false
     }
 }
 

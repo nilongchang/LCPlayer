@@ -12,6 +12,9 @@ public class LCPlayerViewController: UIViewController {
     public lazy var playerView: LCVideoPlayerView = {
         let view = LCVideoPlayerView()
         view.backgroundColor = UIColor.black
+        view.playerControls.closeHander = { [weak self] in
+            self?.dismiss(animated: true)
+        }
         return view
     }()
     // MARK: - Data's ----------------------------
@@ -21,6 +24,7 @@ public class LCPlayerViewController: UIViewController {
     private var supportedOrientations: UIInterfaceOrientationMask?
     // present的方向
     private var presentationOrientation: UIInterfaceOrientation?
+    
     // MARK: - Life Cycle ----------------------------
     /// 初始化video page
     /// - Parameters:

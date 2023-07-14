@@ -105,11 +105,15 @@ public class LCBasePlayerView: UIView, LCPlayerPlaybackDelegate {
         playbackDelegate?.playbackTimeDidChange(player: player, to: time)
     }
     
-//    /// 开始播放（点击 play
-//    func playbackDidBegin(player: LCPlayer)
+    /// 开始播放（点击 play
+    public func playbackDidBegin(player: LCPlayer) {
+        playbackDelegate?.playbackDidBegin(player: player)
+    }
     
-//    /// 暂停播放 （点击 pause
-//    func playbackDidPause(player: LCPlayer)
+    /// 暂停播放 （点击 pause
+    public func playbackDidPause(player: LCPlayer) {
+        playbackDelegate?.playbackDidPause(player: player)
+    }
     
     /// 播放到结束
     public func playbackDidEnd(player: LCPlayer) {
