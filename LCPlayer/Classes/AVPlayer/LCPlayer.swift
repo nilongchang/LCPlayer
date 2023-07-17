@@ -164,11 +164,11 @@ public class LCPlayer: AVPlayer {
                     playbackDelegate?.playbackEndBuffering(player: self)
                 }
                 break
-//            case .playbackBufferFull:
-//                if currentItem?.isPlaybackBufferFull == true {
-//                    playbackDelegate?.playbackEndBuffering(player: self)
-//                }
-//                break
+            case .playbackBufferFull:
+                if currentItem?.isPlaybackBufferFull == true {
+                    playbackDelegate?.playbackEndBuffering(player: self)
+                }
+                break
             default:
                 break
             }

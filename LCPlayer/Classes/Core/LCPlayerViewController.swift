@@ -6,6 +6,8 @@
 //
 
 import UIKit
+import AVFAudio
+
 
 public class LCPlayerViewController: UIViewController {
     // MARK: - UI ----------------------------
@@ -55,6 +57,7 @@ public class LCPlayerViewController: UIViewController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
+        initData()
         startPlay()
     }
 
@@ -76,6 +79,12 @@ public class LCPlayerViewController: UIViewController {
         }else {
             return super.preferredInterfaceOrientationForPresentation
         }
+    }
+    
+    func initData() {
+        let session = AVAudioSession.sharedInstance()
+        try? session.setCategory(.playback)
+        try? session.setActive(true)
     }
     
     /// 开始播放

@@ -85,6 +85,7 @@ public class LCVideoPlayerView: LCBasePlayerView {
     
     private func setupUI() {
         addSubview(playerControls)
+        
     }
     // MARK: - Private Method ----------------------------
     
@@ -107,20 +108,34 @@ public class LCVideoPlayerView: LCBasePlayerView {
         return formatter.string(from: date)
     }
     
+    // MARK: - NetworkSpeedMonitorProtocol ----------------------------
+    /// 下载速度
+    /// - Parameter octets: 速度
+    public override func didReceived(octets: UInt32) {
+        let speed = "加载中...\(formatSpeed(octets: octets))"
+        playerControls.loadingView.speedLabel.text = speed
+//        print(downloadSpeed)
+    }
+    
     // MARK: - LCPlayerPlaybackDelegate ----------------------------
     /// 资源已加载
     public override func playbackAssetLoaded(player: LCPlayer) {
         super.playbackAssetLoaded(player: player)
+        debugPrint("playbackAssetLoaded")
+        netSpeed.begin()
+        playerControls.startLoading()
     }
 
     /// 准备播放（可播放
     public override func playbackPlayerReadyToPlay(player: LCPlayer) {
         super.playbackPlayerReadyToPlay(player: player)
+        debugPrint("playbackPlayerReadyToPlay")
     }
     
     /// 当前item准备播放（可播放
     public override func playbackItemReadyToPlay(player: LCPlayer, item: LCPlayerItem) {
         super.playbackItemReadyToPlay(player: player, item: item)
+        debugPrint("playbackItemReadyToPlay")
         playerControls.bottomBar.startTimeLabel.text = textWithTime(time: player.startTime())
         playerControls.bottomBar.endTimeLabel.text = textWithTime(time: player.endTime())
     }
@@ -128,6 +143,7 @@ public class LCVideoPlayerView: LCBasePlayerView {
     /// 时间改变
     public override func playbackTimeDidChange(player: LCPlayer, to time: CMTime) {
         super.playbackTimeDidChange(player: player, to: time)
+        debugPrint("playbackTimeDidChange")
         if !isBeginDrag {
             playerControls.bottomBar.startTimeLabel.text = textWithTime(time: player.startTime())
             playerControls.bottomBar.progressView.progress = time.seconds / player.endTime()
@@ -137,40 +153,53 @@ public class LCVideoPlayerView: LCBasePlayerView {
     /// 开始播放（点击 play
     public override func playbackDidBegin(player: LCPlayer) {
         super.playbackDidBegin(player: player)
+        debugPrint("playbackDidBegin")
         playerControls.playOrPauseButton.isSelected = true
     }
     
     /// 暂停播放 （点击 pause
     public override func playbackDidPause(player: LCPlayer) {
         super.playbackDidPause(player: player)
+        debugPrint("playbackDidPause")
         playerControls.playOrPauseButton.isSelected = false
     }
     /// 播放到结束
     public override func playbackDidEnd(player: LCPlayer) {
         super.playbackDidEnd(player: player)
+        debugPrint("playbackDidEnd")
         playerControls.playOrPauseButton.isSelected = false
+        netSpeed.stop()
     }
     
     /// 开始缓冲
     public override func playbackStartBuffering(player: LCPlayer) {
         super.playbackStartBuffering(player: player)
+        debugPrint("playbackStartBuffering")
+        playerControls.startLoading()
     }
     
     /// 缓冲的进度
     public override func playbackLoadedTimeRanges(player: LCPlayer, progress: CGFloat) {
         super.playbackLoadedTimeRanges(player: player, progress: progress)
+        debugPrint("playbackLoadedTimeRanges")
         playerControls.bottomBar.progressView.bufferProgress = progress
     }
     
     /// 缓存完毕
     public override func playbackEndBuffering(player: LCPlayer) {
         super.playbackEndBuffering(player: player)
+        playerControls.stopLoading()
+        debugPrint("playbackEndBuffering")
     }
     
     /// 播放错误
     public override func playbackDidFailed(player: LCPlayer, error: Error) {
         super.playbackDidFailed(player: player, error: error)
         playerControls.playOrPauseButton.isSelected = false
+        debugPrint("playbackDidFailed")
+        netSpeed.stop()
+        playerControls.startLoading()
+        playerControls.loadingView.speedLabel.text = "失败"
     }
 }
 

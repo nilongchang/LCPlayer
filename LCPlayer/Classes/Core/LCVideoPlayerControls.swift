@@ -40,9 +40,16 @@ public class LCVideoPlayerControls: UIView {
         button.setImage(Icon.play.image, for: .selected)
         button.setImage(Icon.pause.image, for: .normal)
         button.addTarget(self, action: #selector(playOrPauseAction(_ :)), for: .touchUpInside)
+        button.isHidden = true
         return button
     }()
     
+    /// 网速
+    public lazy var loadingView: LCPlayerLoadingView = {
+        let view = LCPlayerLoadingView()
+        view.isHidden = true
+        return view
+    }()
     /// 关闭回调
     public var closeHander: (() -> Void)?
     /// 旋转回调
@@ -102,7 +109,7 @@ public class LCVideoPlayerControls: UIView {
         addSubview(bottomBar)
         addSubview(closeButton)
         addSubview(rotateButton)
-        
+        addSubview(loadingView)
     }
     
     private func updateLayout() {
@@ -114,7 +121,19 @@ public class LCVideoPlayerControls: UIView {
         rotateButton.frame = CGRect(x: width - 24 - 17, y: height - 24 - 78 - safeBottomBarHeight, width: 24, height: 24)
         topBar.frame = CGRect(x: 0, y: safeTopBarHeight, width: width, height: 44)
         bottomBar.frame = CGRect(x: 0, y: height - safeBottomBarHeight - 23 - 30, width: width, height: 23)
+        loadingView.frame = CGRect(x: 0, y: 0, width: 200, height: 70)
+        loadingView.center = center
     }
+    
+    public func startLoading() {
+        loadingView.isHidden = false
+//        loadingView.speedLabel.text = text
+    }
+    
+    public func stopLoading() {
+        loadingView.isHidden = true
+    }
+    
     // MARK: - Touch Event ----------------------------
     @objc private func closeAction(_ button: UIButton) {
         closeHander?()

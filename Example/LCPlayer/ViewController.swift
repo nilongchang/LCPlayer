@@ -30,7 +30,7 @@ class ViewController: UIViewController {
     }
 
     @IBAction func fullAction(_ sender: UIButton) {
-        let playerVC = LCPlayerViewController(url: "https://ct-vd1.jianzhishuyuan.net//dsh/front/20230711/0063575f1e1b25007806690b46776d63.mp4", title: nil, supportedOrientations: nil, presentationOrientation: nil)
+        let playerVC = LCPlayerViewController(url: "https://ct-vd1.jianzhishuyuan.net//dsh/front/20230711/a71534a9e0e8a7cda36bb246299a00fb.mp4", title: nil, supportedOrientations: nil, presentationOrientation: nil)
         playerVC.modalPresentationStyle = .fullScreen
         present(playerVC, animated: true)
     }

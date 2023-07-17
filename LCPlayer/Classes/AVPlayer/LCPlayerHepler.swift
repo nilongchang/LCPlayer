@@ -100,5 +100,5 @@ enum LCPlayerObserverKey: String, CaseIterable {
     case playbackBufferEmpty = "playbackBufferEmpty"
     case loadedTimeRanges = "loadedTimeRanges"
     case playbackLikelyToKeepUp = "playbackLikelyToKeepUp"
-//    case playbackBufferFull = "playbackBufferFull"
+    case playbackBufferFull = "playbackBufferFull"
 }
