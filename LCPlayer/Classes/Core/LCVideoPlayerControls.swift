@@ -18,44 +18,33 @@ public class LCVideoPlayerControls: UIView {
         return bottomBar
     }()
     
-    /// 关闭
-    public lazy var closeButton: UIButton = {
-        let button = UIButton()
-        button.setBackgroundImage(Icon.close.image, for: .normal)
-        button.addTarget(self, action: #selector(closeAction(_ :)), for: .touchUpInside)
-        return button
+    /// 错误
+    public lazy var errorLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = UIColor.white
+        label.font = UIFont.systemFont(ofSize: 12)
+        label.textAlignment = .center
+        label.isHidden = true
+        return label
     }()
-
+    
     /// 旋转
     public lazy var rotateButton: UIButton = {
         let button = UIButton()
-        button.setBackgroundImage(Icon.rotate.image, for: .normal)
-        button.addTarget(self, action: #selector(closeAction(_ :)), for: .touchUpInside)
+        button.setImage(Icon.rotate.image, for: .normal)
+        button.addTarget(self, action: #selector(rotateAction(_ :)), for: .touchUpInside)
         return button
     }()
-    
-    /// 播放 / 暂停
-    public lazy var playOrPauseButton: UIButton = {
-        let button = UIButton()
-        button.setImage(Icon.play.image, for: .selected)
-        button.setImage(Icon.pause.image, for: .normal)
-        button.addTarget(self, action: #selector(playOrPauseAction(_ :)), for: .touchUpInside)
-        button.isHidden = true
-        return button
-    }()
-    
+
     /// 网速
     public lazy var loadingView: LCPlayerLoadingView = {
         let view = LCPlayerLoadingView()
         view.isHidden = true
         return view
     }()
-    /// 关闭回调
-    public var closeHander: (() -> Void)?
+    
     /// 旋转回调
     public var rotateHander: (() -> Void)?
-    /// 播放 / 暂停回调
-    public var playOrPauseHander: ((_ isPlay: Bool) -> Void)?
     
     // MARK: - Data ----------------------------
     /// 顶部高度
@@ -104,48 +93,45 @@ public class LCVideoPlayerControls: UIView {
     }
     
     private func setupUI() {
-        addSubview(playOrPauseButton)
+        addSubview(errorLabel)
         addSubview(topBar)
         addSubview(bottomBar)
-        addSubview(closeButton)
         addSubview(rotateButton)
         addSubview(loadingView)
     }
     
     private func updateLayout() {
-        let width = bounds.width
-        let height = bounds.height
+        let width = frame.width
+        let height = frame.height
         
-        playOrPauseButton.frame = bounds
-        closeButton.frame = CGRect(x: 15, y: safeTopBarHeight + 30, width: 32, height: 32)
-        rotateButton.frame = CGRect(x: width - 24 - 17, y: height - 24 - 78 - safeBottomBarHeight, width: 24, height: 24)
-        topBar.frame = CGRect(x: 0, y: safeTopBarHeight, width: width, height: 44)
-        bottomBar.frame = CGRect(x: 0, y: height - safeBottomBarHeight - 23 - 30, width: width, height: 23)
+        errorLabel.frame = bounds
+        rotateButton.frame = CGRect(x: width - 44 - 17, y: height - 44 - 78 - safeBottomBarHeight, width: 44, height: 44)
+        topBar.frame = CGRect(x: 0, y: 0, width: width, height: 44)
+        bottomBar.frame = CGRect(x: 0, y: height - 23, width: width, height: 23)
         loadingView.frame = CGRect(x: 0, y: 0, width: 200, height: 70)
         loadingView.center = center
     }
     
     public func startLoading() {
         loadingView.isHidden = false
-//        loadingView.speedLabel.text = text
     }
     
     public func stopLoading() {
         loadingView.isHidden = true
     }
     
-    // MARK: - Touch Event ----------------------------
-    @objc private func closeAction(_ button: UIButton) {
-        closeHander?()
+    
+    /// 显示错误
+    /// - Parameter error: 错误
+    public func showError(_ error: Error) {
+        errorLabel.isHidden = false
+        errorLabel.text = error.localizedDescription
+        bottomBar.isUserInteractionEnabled = false
     }
     
+    // MARK: - Touch Event ----------------------------
     @objc private func rotateAction(_ button: UIButton) {
         rotateHander?()
-    }
-    
-    @objc private func playOrPauseAction(_ button: UIButton) {
-        button.isSelected = !button.isSelected
-        playOrPauseHander?(button.isSelected)
     }
     
 }
@@ -155,8 +141,20 @@ public class ControlTopBarView: UIView {
     public lazy var backButton: UIButton = {
         let button = UIButton()
         button.setImage(Icon.back.image, for: .normal)
+        button.addTarget(self, action: #selector(backAction(_ :)), for: .touchUpInside)
         return button
     }()
+    
+    /// 标题时间
+    public lazy var titleLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = UIColor.white
+        label.font = UIFont.boldSystemFont(ofSize: 16)
+        return label
+    }()
+    
+    /// 返回回调
+    public var backHander: (() -> Void)?
     
     // MARK: - Life Cycle ----------------------------
     override init(frame: CGRect) {
@@ -171,16 +169,35 @@ public class ControlTopBarView: UIView {
     
     public override func layoutSubviews() {
         super.layoutSubviews()
-        backButton.frame = CGRect(x: 0, y: 0, width: 44, height: 44)
-        backButton.center.y = bounds.height / 2
+        
+        let width = frame.width
+        let height = frame.height
+        backButton.frame = CGRect(x: 0, y: 0, width: 44, height: height)
+        titleLabel.frame = CGRect(x: backButton.frame.width, y: 0, width: width - backButton.frame.width, height: height)
     }
     
     private func setupUI() {
         addSubview(backButton)
+        addSubview(titleLabel)
+    }
+    
+    // MARK: - Touch Event ----------------------------
+    @objc private func backAction(_ button: UIButton) {
+        backHander?()
     }
 }
 
 public class ControlBottomBarView: UIView {
+    
+    /// 播放 / 暂停
+    public lazy var playOrPauseButton: UIButton = {
+        let button = UIButton()
+        button.setBackgroundImage(Icon.play.image, for: .selected)
+        button.setBackgroundImage(Icon.pause.image, for: .normal)
+        button.addTarget(self, action: #selector(playOrPauseAction(_ :)), for: .touchUpInside)
+        return button
+    }()
+    
     /// 开始时间
     public lazy var startTimeLabel: UILabel = {
         let label = UILabel()
@@ -211,6 +228,9 @@ public class ControlBottomBarView: UIView {
         return view
     }()
     
+    /// 播放 / 暂停回调
+    public var playOrPauseHander: ((_ isPlay: Bool) -> Void)?
+    
     // MARK: - Life Cycle ----------------------------
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -228,22 +248,30 @@ public class ControlBottomBarView: UIView {
     }
     
     private func setupUI() {
+        addSubview(playOrPauseButton)
         addSubview(startTimeLabel)
         addSubview(endTimeLabel)
         addSubview(progressView)
     }
     
     private func updateLayout() {
-        let width = bounds.width
-        let height = bounds.height
+        let width = frame.width
+        let height = frame.height
         let timeSize = CGSize(width: 57, height: 13)
         
-        startTimeLabel.frame = CGRect(x: 0, y: height - 34, width: timeSize.width, height: timeSize.height)
-        endTimeLabel.frame = CGRect(x: width - timeSize.width, y: startTimeLabel.bounds.minY, width: timeSize.width, height: timeSize.height)
-        progressView.frame = CGRect(x: startTimeLabel.bounds.width, y: startTimeLabel.bounds.minY, width: width - timeSize.width * 2, height: timeSize.height)
+        playOrPauseButton.frame = CGRect(x: 16, y: 0, width: height, height: height)
+        startTimeLabel.frame = CGRect(x: playOrPauseButton.frame.maxX, y: height - 34, width: timeSize.width, height: timeSize.height)
+        endTimeLabel.frame = CGRect(x: width - timeSize.width, y: startTimeLabel.frame.minY, width: timeSize.width, height: timeSize.height)
+        progressView.frame = CGRect(x: startTimeLabel.frame.maxX, y: startTimeLabel.frame.minY, width: width - endTimeLabel.frame.width - startTimeLabel.frame.maxX, height: timeSize.height)
         
         startTimeLabel.center.y = height / 2
         endTimeLabel.center.y = height / 2
         progressView.center.y = height / 2
+    }
+
+    // MARK: - Touch Event ----------------------------
+    @objc private func playOrPauseAction(_ button: UIButton) {
+        button.isSelected = !button.isSelected
+        playOrPauseHander?(button.isSelected)
     }
 }

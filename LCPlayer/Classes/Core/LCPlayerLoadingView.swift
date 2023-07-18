@@ -22,6 +22,7 @@ public class LCPlayerLoadingView: UIView {
         label.textColor = UIColor.white
         label.text = "加载."
         label.textAlignment = .center
+        label.font = UIFont.systemFont(ofSize: 12)
         return label
     }()
     

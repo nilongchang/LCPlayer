@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Foundation
 import AVFoundation
 
 public class LCPlayerRenderingView: UIView {
@@ -18,13 +19,20 @@ public class LCPlayerRenderingView: UIView {
         return layer as! AVPlayerLayer
     }()
     
+    private let player: AVPlayer
     required init(with player: AVPlayer) {
+        self.player = player
         super.init(frame: .zero)
         self.playerLayer.player = player
+        addNotification()
     }
 
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
     override open func didMoveToSuperview() {
@@ -36,5 +44,18 @@ public class LCPlayerRenderingView: UIView {
             rightAnchor.constraint(equalTo: parent.rightAnchor).isActive = true
             bottomAnchor.constraint(equalTo: parent.bottomAnchor).isActive = true
         }
+    }
+    
+    private func addNotification() {
+        NotificationCenter.default.addObserver(self, selector: #selector(removePlayerOnPlayerLayer), name: UIApplication.didEnterBackgroundNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(resetPlayerOnPlayerLayer), name: UIApplication.willEnterForegroundNotification, object: nil)
+    }
+    
+    @objc private func removePlayerOnPlayerLayer() {
+        self.playerLayer.player = nil
+    }
+    
+    @objc private func resetPlayerOnPlayerLayer() {
+        self.playerLayer.player = player
     }
 }

@@ -30,60 +30,10 @@ class ViewController: UIViewController {
     }
 
     @IBAction func fullAction(_ sender: UIButton) {
-        let playerVC = LCPlayerViewController(url: "https://ct-vd1.jianzhishuyuan.net//dsh/front/20230711/a71534a9e0e8a7cda36bb246299a00fb.mp4", title: nil, supportedOrientations: nil, presentationOrientation: nil)
+        let playerVC = LCPlayerViewController(url: "https://ct-vd1.jianzhishuyuan.net//dsh/front/20230711/a71534a9e0e8a7cda36bb246299a00fb.mp4", title: "视频标题", supportedOrientations: [.portrait, .landscapeRight], presentationOrientation: .portrait)
         playerVC.modalPresentationStyle = .fullScreen
         present(playerVC, animated: true)
     }
     
 
-}
-
-// MARK: - LCPlayerPlaybackDelegate ----------------------------
-extension ViewController: LCPlayerPlaybackDelegate {
-    
-    
-    func playbackAssetLoaded(player: LCPlayer) {
-        print("playbackAssetLoaded")
-    }
-    
-    func playbackPlayerReadyToPlay(player: LCPlayer) {
-        print("playbackPlayerReadyToPlay")
-    }
-    
-    func playbackItemReadyToPlay(player: LCPlayer, item: LCPlayerItem) {
-        print("playbackItemReadyToPlay: \(item)")
-    }
-    
-    func playbackTimeDidChange(player: LCPlayer, to time: CMTime) {
-        print("playbackTimeDidChange: \(time)")
-    }
-    
-    func playbackDidBegin(player: LCPlayer) {
-        print("playbackDidBegin")
-    }
-    
-    func playbackDidPause(player: LCPlayer) {
-        print("playbackDidPause")
-    }
-    func playbackDidEnd(player: LCPlayer) {
-        print("playbackDidEnd")
-    }
-    
-    func playbackStartBuffering(player: LCPlayer) {
-        print("playbackStartBuffering")
-    }
-    
-    func playbackLoadedTimeRanges(player: LCPlayer, progress: CGFloat) {
-        print("playbackLoadedTimeRanges: \(progress)")
-    }
-    
-    func playbackEndBuffering(player: LCPlayer) {
-        print("playbackEndBuffering")
-    }
-    
-    func playbackDidFailed(player: LCPlayer, error: Error) {
-        print("playbackDidFailed")
-    }
-    
-    
 }

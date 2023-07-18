@@ -14,8 +14,25 @@ public class LCPlayerViewController: UIViewController {
     public lazy var playerView: LCVideoPlayerView = {
         let view = LCVideoPlayerView()
         view.backgroundColor = UIColor.black
-        view.playerControls.closeHander = { [weak self] in
-            self?.dismiss(animated: true)
+        view.playerControls.topBar.titleLabel.text = videoTitle
+        view.playerControls.topBar.backHander = { [weak self] in
+            guard let self = self else { return }
+            let orientation = self.currentInterfaceOrientation()
+            if orientation.isLandscape {
+                self.exitFullScreen()
+            } else {
+                self.dismiss(animated: true)
+            }
+        }
+        // 旋转
+        view.playerControls.rotateHander = { [weak self] in
+            guard let self = self else { return }
+            let orientation = self.currentInterfaceOrientation()
+            if orientation.isLandscape {
+                self.exitFullScreen()
+            } else {
+                self.enterFullScreen()
+            }
         }
         return view
     }()
@@ -81,6 +98,13 @@ public class LCPlayerViewController: UIViewController {
         }
     }
     
+    public override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
+    }
+    
+    public override var prefersStatusBarHidden: Bool {
+        return false
+    }
     func initData() {
         let session = AVAudioSession.sharedInstance()
         try? session.setCategory(.playback)
@@ -92,5 +116,69 @@ public class LCPlayerViewController: UIViewController {
         guard let url = URL(string: videoUrl) else { return }
         let item = LCPlayerItem(url: url)
         playerView.setItem(item)
+    }
+    
+    func enterFullScreen(_ animated: Bool = true){
+        if #available(iOS 16.0, *) {
+            guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene else { return }
+            let orientation = scene.effectiveGeometry.interfaceOrientation
+            debugPrint("orientation:\(orientation) isPortrait:\(orientation.isPortrait)")
+            if orientation.isPortrait {
+                self.setNeedsUpdateOfSupportedInterfaceOrientations()
+                self.navigationController?.setNeedsUpdateOfSupportedInterfaceOrientations()
+                guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene else { return }
+                let geometryPreferences = UIWindowScene.GeometryPreferences.iOS(interfaceOrientations: .landscapeRight)
+                scene.requestGeometryUpdate(geometryPreferences) { error in
+                    debugPrint(error.localizedDescription)
+                }
+            }
+            
+        } else {
+            let orientation = UIDevice.current.orientation
+            debugPrint("orientation:\(orientation) isPortrait:\(orientation.isPortrait)")
+            if orientation.isPortrait {
+                UIDevice.current.setValue(UIInterfaceOrientation.landscapeRight.rawValue, forKey: "orientation")
+                self.setNeedsStatusBarAppearanceUpdate()
+                UIViewController.attemptRotationToDeviceOrientation()                
+            }
+        }
+    }
+    
+    func exitFullScreen(_ animated: Bool = true){
+        if #available(iOS 16.0, *) {
+            guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene else { return }
+            let orientation = scene.effectiveGeometry.interfaceOrientation
+            debugPrint("orientation:\(orientation) isLandscape:\(orientation.isLandscape)")
+            if orientation.isLandscape {
+                self.setNeedsUpdateOfSupportedInterfaceOrientations()
+                self.navigationController?.setNeedsUpdateOfSupportedInterfaceOrientations()
+                
+                debugPrint("error.localizedDescription")
+                
+                let geometryPreferences = UIWindowScene.GeometryPreferences.iOS(interfaceOrientations: .portrait)
+                scene.requestGeometryUpdate(geometryPreferences) { error in
+                    debugPrint(error.localizedDescription)
+                }
+            }
+            
+        } else {
+            let orientation = UIDevice.current.orientation
+            debugPrint("orientation:\(orientation) isLandscape:\(orientation.isLandscape)")
+            if orientation.isLandscape {
+                UIDevice.current.setValue(UIInterfaceOrientation.portrait.rawValue, forKey: "orientation")
+                self.setNeedsStatusBarAppearanceUpdate()
+                UIViewController.attemptRotationToDeviceOrientation()
+            }
+        }
+    }
+    
+    func currentInterfaceOrientation() -> UIInterfaceOrientation {
+        if #available(iOS 16.0, *) {
+            guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene else { return preferredInterfaceOrientationForPresentation }
+            return scene.effectiveGeometry.interfaceOrientation
+            
+        } else {
+            return UIInterfaceOrientation(rawValue: UIDevice.current.orientation.rawValue) ?? preferredInterfaceOrientationForPresentation
+        }
     }
 }

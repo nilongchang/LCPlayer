@@ -31,24 +31,29 @@ public class LCVideoPlayerSlider: UIView {
             updataLayout()
         }
     }
+    
     /// 轨道高度
     public var trackHeight: CGFloat = 4
+    
     /// 轨道圆角
     public var trackRadius: CGFloat = 2 {
         didSet { setupRadius() }
     }
+    
     /// 轨道颜色
     public var trackTintColor: UIColor = UIColor.white {
         didSet {
             trackView.backgroundColor = trackTintColor
         }
     }
+    
     /// 进度颜色
     public var progressTintColor: UIColor = UIColor.white {
         didSet {
             progressView.backgroundColor = progressTintColor
         }
     }
+    
     /// 缓冲颜色
     public var bufferTintColor: UIColor = UIColor.white {
         didSet {
@@ -58,18 +63,22 @@ public class LCVideoPlayerSlider: UIView {
     
     /// 滑块大小
     public var thumbSize: CGSize = CGSize(width: 12, height: 12)
+    
     /// 滑块圆角
     public var thumbRadius: CGFloat = 6 {
         didSet { setupRadius() }
     }
+    
     /// 滑块图片
     public var thumbImage: UIImage? {
         didSet { thumbImageView.image = thumbImage }
     }
-    /// 滑动手势承载view大小
-    public var panGestureSize: CGSize = CGSize(width: 30, height: 30)
-    // 回调
+    
+    /// 回调
     public var handlerBlock: ((VideoPlayerSliderState) -> Void)?
+    
+    /// 拖拽前的进度
+    private var beginProgress: CGFloat = 0
     
     // MARK: - UI ----------------------------
     /// 轨道
@@ -91,13 +100,6 @@ public class LCVideoPlayerSlider: UIView {
     private lazy var thumbImageView: UIImageView = {
         let view = UIImageView()
         view.backgroundColor = .clear
-//        view.isUserInteractionEnabled = true
-        return view
-    }()
-    
-    ///  滑动手势承载view
-    private lazy var panGestureView: UIView = {
-        let view = UIView()
         return view
     }()
     
@@ -122,7 +124,6 @@ public class LCVideoPlayerSlider: UIView {
         addSubview(bufferView)
         addSubview(progressView)
         addSubview(thumbImageView)
-        addSubview(panGestureView)
         
         trackView.backgroundColor = trackTintColor
         bufferView.backgroundColor = bufferTintColor
@@ -136,8 +137,9 @@ public class LCVideoPlayerSlider: UIView {
         addGestureRecognizer(tap)
         
         let pan = UIPanGestureRecognizer(target: self, action: #selector(panAction(_:)))
-        panGestureView.addGestureRecognizer(pan)
+        addGestureRecognizer(pan)
         
+        thumbImageView.frame = CGRect(origin: CGPoint.zero, size: thumbSize)
     }
     
     private func updataLayout() {
@@ -159,8 +161,6 @@ public class LCVideoPlayerSlider: UIView {
         bufferView.frame = CGRect(x: 0, y: 0, width: bufferW, height: trackHeight)
         let progressW = width * progress
         progressView.frame = CGRect(x: 0, y: 0, width: progressW, height: trackHeight)
-        thumbImageView.frame = CGRect(origin: CGPoint.zero, size: thumbSize)
-        panGestureView.frame = CGRect(origin: CGPoint.zero, size: panGestureSize)
         
         trackView.center.y = cententY
         bufferView.center.y = cententY
@@ -169,7 +169,6 @@ public class LCVideoPlayerSlider: UIView {
         let centerX = max(minx, thumbSize.width / 2)
         
         thumbImageView.center = CGPoint(x: centerX, y: cententY)
-        panGestureView.center = thumbImageView.center
     }
     
     func setupRadius() {
@@ -199,36 +198,30 @@ public class LCVideoPlayerSlider: UIView {
     @objc func panAction(_ pan: UIPanGestureRecognizer) {
         switch pan.state {
         case .began:
-            debugPrint("begin taouch")
             UIView.animate(withDuration: 0.25) {
                 self.thumbImageView.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
             }
+            beginProgress = progress
             handlerBlock?(.began(progress: progress))
             break
         case .changed:
-            var locationPoint = pan.location(in: self)
-//            let minX = thumbImageView.bounds.width * 0.5
-//            let maxX = bounds.width - minX
-//            var rect = thumbImageView.frame
-//            rect.origin.x += specifiedPoint.x
-            if locationPoint.x < 0 {
-                locationPoint.x = 0
-            }
-            if locationPoint.x > bounds.width {
-                locationPoint.x = bounds.width
-            }
-            progress = locationPoint.x / bounds.width
-            debugPrint("value = \(progress) \(locationPoint)")
+            let translationPoint = pan.translation(in: self)
+            let translationProgress = translationPoint.x / bounds.width
+            var newProgress = translationProgress + beginProgress
+            newProgress = min(newProgress, 1)
+            newProgress = max(0, newProgress)
+            progress = newProgress
             handlerBlock?(.changed(progress: progress))
             break
         case .ended:
-//            thumbViewFrame = .zero
+            debugPrint("ended")
             UIView.animate(withDuration: 0.25) {
                 self.thumbImageView.transform = .identity
             }
             handlerBlock?(.ended(progress: progress))
             break
         case .cancelled,.failed:
+            debugPrint("cancelled")
             handlerBlock?(.cancel)
             break
         default:
